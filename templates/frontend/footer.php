@@ -1,14 +1,11 @@
     </div> <!-- Aquí cerramos el contenedor lateral abierto en el head.php -->
 
     <!-- PIE DE PÁGINA (FOOTER) -->
-    <footer class="container-fluid py-3 bg-light border-top">
-        <div class="d-flex justify-content-between align-items-center px-4">
+    <footer class="container-fluid py-3 bg-light border-top mt-auto">
+        <div class="position-relative d-flex align-items-center justify-content-between px-4">
             <span class="text-body-secondary small">© 2026 Sistema Gestor Personal Premium</span>
-            <ul class="nav">
-                <li class="nav-item small">
-                    <a href="#" class="nav-link px-2 text-body-secondary">Centro de Soporte</a>
-                </li>
-            </ul>
+            <button id="toggleDarkModeBtn" type="button" class="btn btn-sm btn-outline-secondary position-absolute top-50 start-50 translate-middle">Modo noche</button>
+            <a href="#" class="nav-link px-2 text-body-secondary small mb-0">Centro de Soporte</a>
         </div>
     </footer>
 
@@ -22,5 +19,37 @@
     ?>
     <!-- Esto activa los menús desplegables y animaciones de Bootstrap -->
     <script src="<?php echo h($rutaBaseScript); ?>/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            var btn = document.getElementById('toggleDarkModeBtn');
+            var storageKey = 'gestorPersonalDarkMode';
+
+            function setDarkMode(enabled) {
+                document.body.classList.toggle('dark-mode', enabled);
+                if (btn) {
+                    btn.textContent = enabled ? 'Modo claro' : 'Modo noche';
+                }
+                try {
+                    localStorage.setItem(storageKey, enabled ? '1' : '0');
+                } catch (e) {
+                    // Ignore if localStorage is unavailable.
+                }
+            }
+
+            if (!btn) return;
+
+            btn.addEventListener('click', function() {
+                setDarkMode(!document.body.classList.contains('dark-mode'));
+            });
+
+            var saved = null;
+            try {
+                saved = localStorage.getItem(storageKey);
+            } catch (e) {
+                saved = null;
+            }
+            setDarkMode(saved === '1');
+        })();
+    </script>
 </body>
 </html>

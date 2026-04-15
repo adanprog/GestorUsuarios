@@ -62,7 +62,7 @@ foreach ($todasLasDirecciones as $dir):
     }
 ?>
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border border-secondary border-opacity-25">
                     <div class="card-body">
                         <!-- Título de la dirección -->
                         <h5 class="card-title fw-bold text-primary mb-1"><?php echo htmlspecialchars($dir->getNombre() ?? '', ENT_QUOTES, 'UTF-8'); ?></h5>

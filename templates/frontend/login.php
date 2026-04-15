@@ -3,10 +3,7 @@
  * VISTA LOGIN
  * ----------
  * Muestra el formulario de inicio de sesión.
- * Al pulsar el botón, envía los datos a login_back.php para validarlos.
  */
-error_reporting(E_ALL ^ E_NOTICE);
-require_once("templates/backend/login_back.php");
 ?>
 
 <main class="form-signin m-auto" style="max-width: 330px;">
@@ -15,24 +12,24 @@ require_once("templates/backend/login_back.php");
 
                 <h1 class="h3 mb-3 fw-normal">Iniciar sesión</h1>
 
-                <div class="form-floating">
+                <div class="form-floating mb-3">
                         <input
                         type="email"
                         class="form-control"
                         id="floatingInput"
-                        placeholder="name@example.com"
+                        placeholder="Correo"
                         name="email"
                         value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" required
                         >
                         <label for="floatingInput">Correo</label>
                 </div>
 
-                <div class="form-floating">
+                <div class="form-floating mb-3">
                         <input
                         type="password"
                         class="form-control"
                         id="floatingPassword"
-                        placeholder="Password"
+                        placeholder="Contraseña"
                         name="password"
                         >
                         <label for="floatingPassword">Contraseña</label>

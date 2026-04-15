@@ -13,7 +13,7 @@ require_once("sidebar.php");
 ?>
 
 <!-- El contenido principal de la bienvenida -->
-<main class="flex-grow-1 d-flex justify-content-center align-items-center p-3 bg-light" style="min-height: calc(100vh - 56px);">
+<main class="flex-grow-1 d-flex justify-content-center align-items-center p-3 bg-light">
     <div class="text-center">
         <!-- Títulos de bienvenida -->
         <h1 class="display-4 fw-bold text-dark">¡Hola de nuevo!</h1>

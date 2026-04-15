@@ -7,6 +7,7 @@
 require_once('../backend/procesar_roles.php'); // Lógica de los formularios de roles.
 require_once __DIR__ . '/../../clases/CPRole.php';
 require_once __DIR__ . '/../../clases/CPUser.php';
+require_once('head.php');
 require_once('sidebar.php'); // Menú lateral de navegación.
 
 $currentUser = CPUser::buscarPorEmail($_SESSION['email'] ?? '');

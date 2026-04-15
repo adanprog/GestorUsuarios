@@ -4,6 +4,9 @@ error_reporting(E_ALL ^ E_NOTICE);
 
 // Iniciamos la sesión para poder recordar al usuario que está conectado.
 session_start();
+
+// Procesamos el login antes de enviar cualquier salida al navegador.
+require_once("templates/backend/login_back.php");
 ?>
 
 <?php
