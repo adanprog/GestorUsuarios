@@ -8,29 +8,33 @@
 require_once('../backend/procesar_direcciones.php'); // Lógica para guardar, editar o borrar direcciones.
 require_once __DIR__ . '/../../clases/CPUser.php';
 
+// Cargamos las partes comunes de la página: estilos, menú y seguridad.
 require_once('head.php');
 require_once('sidebar.php');
 
-//Carga códigos postales desde caché JSON en lugar de XLSX
+// Preparación de los códigos postales.
+// El sistema usa un archivo Excel grande solo la primera vez,
+// luego guarda la información en un archivo JSON más rápido.
 $dirArchivoCodigos = __DIR__ . '/../../archivos/codigos_postales_municipios.xlsx';
 $fileJsonCache = __DIR__ . '/../../archivos/codigos_postales_cache.json';
 
-// Si el caché no existe o el XLSX es más nuevo, regenerar el caché
+// Si no existe el caché o el archivo Excel es más reciente, regeneramos los datos.
 if (!file_exists($fileJsonCache) || filemtime($dirArchivoCodigos) > filemtime($fileJsonCache)) {
     require_once '../clases/CPDesplegableDir.php';
     $codigoPostal = new CPDesplegableDir($dirArchivoCodigos, 'A');
     $mapaCodigos = $codigoPostal->obtenerMapaCpCiudadProvincia('A', 'C', 'B');
-    // Guardar en caché
+    // Guardar el resultado en un archivo JSON para usarlo más rápido después.
     file_put_contents($fileJsonCache, json_encode($mapaCodigos));
 } else {
-    // Cargar desde caché
+    // Si ya hay un archivo JSON guardado, lo leemos directamente.
     $mapaCodigos = json_decode(file_get_contents($fileJsonCache), true);
 }
 
-// Crear lista de códigos postales ordenados, sin duplicados
+// Creamos una lista ordenada de códigos postales disponibles.
 $nombrescodigosPostales = array_keys($mapaCodigos);
 sort($nombrescodigosPostales, SORT_STRING);
 
+// Consultamos el usuario que ha iniciado sesión y sus permisos.
 $currentUser = CPUser::buscarPorEmail($_SESSION['email']);
 $canAddDirecciones = $currentUser ? $currentUser->canAddDirecciones() : false;
 $canEditDirecciones = $currentUser ? $currentUser->canEditDirecciones() : false;
@@ -39,7 +43,7 @@ $canViewAllDirecciones = $currentUser ? $currentUser->canViewAllDirecciones() : 
 $canViewCreator = $currentUser ? $currentUser->canViewCreator() : false;
 ?>
 <main class="flex-grow-1 p-4 bg-light">
-    <!-- Título y botón de añadir -->
+    <!-- Encabezado de la página: título y botón para añadir una nueva dirección -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h4 fw-bold mb-0">Gestión de Direcciones</h2>
         <?php if ($canAddDirecciones): ?>
@@ -49,10 +53,10 @@ $canViewCreator = $currentUser ? $currentUser->canViewCreator() : false;
         <?php endif; ?>
     </div>
 
-    <!-- Mensajes de estado globales -->
+    <!-- Aquí se muestra un mensaje cuando se guarda, edita o borra una dirección. -->
     <?php cp_render_alert_message($message ?? null, $messageType ?? null); ?>
 
-    <!-- TARJETAS DE DIRECCIONES (GRID) -->
+    <!-- Lista de tarjetas con cada dirección visible al usuario -->
     <div class="row g-4">
         <?php
 $todasLasDirecciones = CPDir::leerTodo();
@@ -87,6 +91,7 @@ foreach ($todasLasDirecciones as $dir):
                     
                     <!-- Botones de acción en la tarjeta -->
                     <div class="card-footer bg-transparent border-0 d-flex justify-content-end gap-2 pb-3">
+                        <!-- Botones para editar o borrar la dirección según permisos -->
                         <?php if ($canEditDirecciones): ?>
                             <button type="button" class="btn btn-sm btn-outline-warning edit-dir-btn" data-bs-toggle="modal" data-bs-target="#editDirModal"
                                 data-id="<?php echo htmlspecialchars($dir->getId(), ENT_QUOTES, 'UTF-8'); ?>"
@@ -195,9 +200,16 @@ endforeach; ?>
 </div>
 
 <script>
+    // Mapa de códigos postales cargado desde PHP.
     const mapaCodigos = <?= json_encode($mapaCodigos, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
     const todosLosCodigos = Object.keys(mapaCodigos);
 
+    /**
+     * Prepara un buscador de código postal que muestra sugerencias al escribir.
+     * inputId: campo donde el usuario escribe el código postal.
+     * suggestionsId: contenedor donde se muestran las opciones.
+     * ciudadId / provinciaId: campos que se rellenan automáticamente.
+     */
     function inicializarBuscadorPostal(inputId, suggestionsId, ciudadId, provinciaId) {
         const input = document.getElementById(inputId);
         const suggestions = document.getElementById(suggestionsId);
@@ -254,6 +266,7 @@ endforeach; ?>
     }
 
     function actualizarCiudadProvincia(codigo, ciudad, provincia) {
+        // Rellena ciudad y provincia según el código postal seleccionado.
         if (codigo && mapaCodigos[codigo]) {
             ciudad.value = mapaCodigos[codigo].ciudad || '';
             provincia.value = mapaCodigos[codigo].provincia || '';
@@ -263,6 +276,9 @@ endforeach; ?>
         }
     }
 
+    /**
+     * Evita que el texto con símbolos rompa el HTML de la lista de sugerencias.
+     */
     function htmlEscape(str) {
         const div = document.createElement('div');
         div.textContent = str;
@@ -274,6 +290,7 @@ endforeach; ?>
 
     const editDirModal = document.getElementById('editDirModal');
     if (editDirModal) {
+        // Cuando se abre el modal de edición, copiamos los datos de la tarjeta a los campos del formulario.
         editDirModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
             if (!button) return;

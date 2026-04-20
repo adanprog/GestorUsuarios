@@ -56,7 +56,58 @@ $listaRolesNumerados = array_values($roles);
     <?php cp_render_alert_message($message ?? null, $messageType ?? null); ?>
 
     <div class="row g-4">
-        <div class="col-lg-7">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Crear nuevo rol</h2>
+                </div>
+                <div class="card-body cp-users-card-body">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre del rol</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descripción</label>
+                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                            <div class="form-text">Descripción opcional para el rol.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Permisos del rol</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="perm_view_direcciones" name="perm_view_direcciones" value="1">
+                                <label class="form-check-label" for="perm_view_direcciones">Ver direcciones</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="perm_view_creator" name="perm_view_creator" value="1">
+                                <label class="form-check-label" for="perm_view_creator">Ver qué usuario ha creado la dirección</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="perm_add_direcciones" name="perm_add_direcciones" value="1">
+                                <label class="form-check-label" for="perm_add_direcciones">Crear dirección</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="perm_edit" name="perm_edit" value="1">
+                                <label class="form-check-label" for="perm_edit">Editar</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="perm_delete" name="perm_delete" value="1">
+                                <label class="form-check-label" for="perm_delete">Eliminar</label>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="active" name="active" checked>
+                            <label class="form-check-label" for="active">Activo</label>
+                        </div>
+                        <button type="submit" name="add_role" class="btn btn-success w-100">
+                            <i class="bi bi-plus-circle me-1"></i> Añadir rol
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
                     <div>
@@ -68,9 +119,9 @@ $listaRolesNumerados = array_values($roles);
                         <input id="rolesSearch" type="text" class="form-control form-control-sm" placeholder="Nombre o descripción">
                     </div>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0 cp-users-card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0 align-middle">
+                        <table class="table table-hover mb-0 align-middle cp-users-table">
                             <thead class="table-light">
                                 <tr>
                                     <th>ID</th>
@@ -157,57 +208,6 @@ $listaRolesNumerados = array_values($roles);
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="h5 mb-0">Crear nuevo rol</h2>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nombre del rol</label>
-                            <input type="text" id="name" name="name" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Descripción</label>
-                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
-                            <div class="form-text">Descripción opcional para el rol.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Permisos del rol</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="perm_view_direcciones" name="perm_view_direcciones" value="1">
-                                <label class="form-check-label" for="perm_view_direcciones">Ver direcciones</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="perm_view_creator" name="perm_view_creator" value="1">
-                                <label class="form-check-label" for="perm_view_creator">Ver qué usuario ha creado la dirección</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="perm_add_direcciones" name="perm_add_direcciones" value="1">
-                                <label class="form-check-label" for="perm_add_direcciones">Crear dirección</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="perm_edit" name="perm_edit" value="1">
-                                <label class="form-check-label" for="perm_edit">Editar</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="perm_delete" name="perm_delete" value="1">
-                                <label class="form-check-label" for="perm_delete">Eliminar</label>
-                            </div>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="active" name="active" checked>
-                            <label class="form-check-label" for="active">Activo</label>
-                        </div>
-                        <button type="submit" name="add_role" class="btn btn-success w-100">
-                            <i class="bi bi-plus-circle me-1"></i> Añadir rol
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="row g-4 mt-4">
@@ -220,9 +220,9 @@ $listaRolesNumerados = array_values($roles);
                     </div>
                     <span class="badge bg-light text-dark"><?php echo count($usuarios); ?> usuarios</span>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0 cp-users-card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0 align-middle">
+                        <table class="table table-hover mb-0 align-middle cp-users-table">
                             <thead class="table-light">
                                 <tr>
                                     <th>Email</th>

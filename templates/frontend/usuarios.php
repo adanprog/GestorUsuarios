@@ -28,8 +28,8 @@ $isAdminUser = $currentUser ? $currentUser->esAdministrador() : false;
 
     <!-- TABLA donde se listan los usuarios reales -->
     <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
+        <div class="card-body p-0 cp-users-card-body">
+            <table class="table table-hover mb-0 cp-users-table">
                 <thead class="table-light text-uppercase smaller fw-bold">
                     <tr>
                         <th class="ps-3">Correo Electrónico</th>

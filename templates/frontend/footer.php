@@ -2,9 +2,8 @@
 
     <!-- PIE DE PÁGINA (FOOTER) -->
     <footer class="container-fluid py-3 bg-light border-top mt-auto">
-        <div class="position-relative d-flex align-items-center justify-content-between px-4">
+        <div class="d-flex align-items-center justify-content-between px-4">
             <span class="text-body-secondary small">© 2026 Sistema Gestor Personal Premium</span>
-            <button id="toggleDarkModeBtn" type="button" class="btn btn-sm btn-outline-secondary position-absolute top-50 start-50 translate-middle">Modo noche</button>
             <a href="#" class="nav-link px-2 text-body-secondary small mb-0">Centro de Soporte</a>
         </div>
     </footer>
