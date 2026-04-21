@@ -45,7 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_dir'])) {
             $_SESSION['email'], // Usuario que creó la dirección.
             '',
             'propietario',
-            $userId
+            $userId,
+            trim($_POST['nombrePropietario'] ?? ''),
+            trim($_POST['telefonoPropietario'] ?? ''),
+            trim($_POST['emailPropietario'] ?? '')
         );
 
         if ($dir->guardar()) {
@@ -84,7 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_dir'])) {
                 $dir->getEmail(),
                 '',
                 $dir->getRole(),
-                $dir->getUserId()
+                $dir->getUserId(),
+                trim($_POST['nombrePropietario'] ?? ''),
+                trim($_POST['telefonoPropietario'] ?? ''),
+                trim($_POST['emailPropietario'] ?? '')
             );
 
             if ($updatedDir->guardar()) {

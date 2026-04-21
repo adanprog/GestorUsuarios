@@ -102,7 +102,25 @@ $isAdminUser = $currentUser ? $currentUser->esAdministrador() : false;
                 <div class="modal-header"><h5>Añadir Nuevo Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
                     <div class="mb-3"><label>Correo</label><input type="email" name="email" class="form-control" placeholder="ejemplo@email.com" required></div>
-                    <div class="mb-3"><label>Contraseña</label><input type="password" name="password" class="form-control" required></div>
+                    <div class="mb-3">
+                        <label>Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="add_password" class="form-control" required>
+                            <button class="btn btn-outline-secondary toggle-password-btn" type="button" data-target="add_password">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label>Confirmar Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" name="password_confirm" id="add_password_confirm" class="form-control" required>
+                            <button class="btn btn-outline-secondary toggle-password-btn" type="button" data-target="add_password_confirm">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <small class="text-danger d-none" id="add_password_error">Las contraseñas no coinciden</small>
+                    </div>
                     <div class="mb-3">
                         <label>Rol</label>
                         <?php if ($isAdminUser): ?>
@@ -140,7 +158,22 @@ $isAdminUser = $currentUser ? $currentUser->esAdministrador() : false;
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Contraseña Nueva</label>
-                    <input type="password" name="password" id="edit_password" class="form-control" placeholder="Escribe para cambiar..." required>
+                    <div class="input-group">
+                        <input type="password" name="password" id="edit_password" class="form-control" placeholder="Escribe para cambiar...">
+                        <button class="btn btn-outline-secondary toggle-password-btn" type="button" data-target="edit_password">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirmar Contraseña</label>
+                    <div class="input-group">
+                        <input type="password" name="password_confirm" id="edit_password_confirm" class="form-control" placeholder="Repite la contraseña...">
+                        <button class="btn btn-outline-secondary toggle-password-btn" type="button" data-target="edit_password_confirm">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <small class="text-danger d-none" id="password_error">Las contraseñas no coinciden</small>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Nuevo Rol</label>
@@ -179,11 +212,98 @@ document.addEventListener('DOMContentLoaded', function () {
             // Pasamos los datos del botón (dataset) a los inputs del modal
             document.getElementById('edit_original_email').value = this.dataset.email;
             document.getElementById('edit_email').value = this.dataset.email;
+            document.getElementById('edit_password').value = '';
+            document.getElementById('edit_password_confirm').value = '';
             document.getElementById('edit_role').value = this.dataset.role;
             document.getElementById('edit_active').checked = this.dataset.active === '1';
+            document.getElementById('password_error').classList.add('d-none');
             modalEditar.show();
         });
     });
+
+    // Toggle mostrar/ocultar contraseña
+    document.querySelectorAll('.toggle-password-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.dataset.target;
+            const input = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+    });
+
+    // Validar que las contraseñas coincidan en modal de edición
+    const passwordInput = document.getElementById('edit_password');
+    const passwordConfirm = document.getElementById('edit_password_confirm');
+    const passwordError = document.getElementById('password_error');
+    const editUserForm = document.querySelector('#editUserModal form');
+
+    function validateEditPasswords() {
+        if (passwordInput.value || passwordConfirm.value) {
+            if (passwordInput.value !== passwordConfirm.value) {
+                passwordError.classList.remove('d-none');
+                return false;
+            } else {
+                passwordError.classList.add('d-none');
+                return true;
+            }
+        }
+        passwordError.classList.add('d-none');
+        return true;
+    }
+
+    if (passwordInput && passwordConfirm) {
+        [passwordInput, passwordConfirm].forEach(input => {
+            input.addEventListener('input', validateEditPasswords);
+        });
+
+        if (editUserForm) {
+            editUserForm.addEventListener('submit', function(e) {
+                if (!validateEditPasswords()) {
+                    e.preventDefault();
+                }
+            });
+        }
+    }
+
+    // Validar que las contraseñas coincidan en modal de añadir
+    const addPasswordInput = document.getElementById('add_password');
+    const addPasswordConfirm = document.getElementById('add_password_confirm');
+    const addPasswordError = document.getElementById('add_password_error');
+    const addUserForm = document.querySelector('#addUserModal form');
+
+    function validateAddPasswords() {
+        if (addPasswordInput.value !== addPasswordConfirm.value) {
+            addPasswordError.classList.remove('d-none');
+            return false;
+        } else {
+            addPasswordError.classList.add('d-none');
+            return true;
+        }
+    }
+
+    if (addPasswordInput && addPasswordConfirm) {
+        [addPasswordInput, addPasswordConfirm].forEach(input => {
+            input.addEventListener('input', validateAddPasswords);
+        });
+
+        if (addUserForm) {
+            addUserForm.addEventListener('submit', function(e) {
+                if (!validateAddPasswords()) {
+                    e.preventDefault();
+                }
+            });
+        }
+    }
 });
 </script>
 

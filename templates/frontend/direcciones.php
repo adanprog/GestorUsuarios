@@ -56,8 +56,18 @@ $canViewCreator = $currentUser ? $currentUser->canViewCreator() : false;
     <!-- Aquí se muestra un mensaje cuando se guarda, edita o borra una dirección. -->
     <?php cp_render_alert_message($message ?? null, $messageType ?? null); ?>
 
+    <!-- Buscador de direcciones -->
+    <div class="mb-4">
+        <div class="input-group">
+            <span class="input-group-text bg-white">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" id="searchDirecciones" class="form-control" placeholder="Buscar por nombre, propietario, calle, ciudad...">
+        </div>
+    </div>
+
     <!-- Lista de tarjetas con cada dirección visible al usuario -->
-    <div class="row g-4">
+    <div class="row g-4" id="direccionesContainer">
         <?php
 $todasLasDirecciones = CPDir::leerTodo();
 foreach ($todasLasDirecciones as $dir):
@@ -65,7 +75,7 @@ foreach ($todasLasDirecciones as $dir):
         continue;
     }
 ?>
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-6 col-lg-4 direccion-card" data-nombre="<?php echo htmlspecialchars($dir->getNombre(), ENT_QUOTES, 'UTF-8'); ?>" data-propietario="<?php echo htmlspecialchars($dir->getNombrePropietario(), ENT_QUOTES, 'UTF-8'); ?>" data-calle="<?php echo htmlspecialchars($dir->getCalle(), ENT_QUOTES, 'UTF-8'); ?>" data-ciudad="<?php echo htmlspecialchars($dir->getCiudad(), ENT_QUOTES, 'UTF-8'); ?>" data-provincia="<?php echo htmlspecialchars($dir->getProvincia(), ENT_QUOTES, 'UTF-8'); ?>" data-email-prop="<?php echo htmlspecialchars($dir->getEmailPropietario(), ENT_QUOTES, 'UTF-8'); ?>" data-tel-prop="<?php echo htmlspecialchars($dir->getTelefonoPropietario(), ENT_QUOTES, 'UTF-8'); ?>">
                 <div class="card h-100 shadow-sm border border-secondary border-opacity-25">
                     <div class="card-body">
                         <!-- Título de la dirección -->
@@ -75,6 +85,27 @@ foreach ($todasLasDirecciones as $dir):
                             <div class="small mb-2">
                                 <i class="bi bi-person-circle me-2 text-info"></i><strong>Creado por:</strong> <?php echo htmlspecialchars($dir->getEmail() ?? '', ENT_QUOTES, 'UTF-8'); ?>
                             </div>
+                        <?php endif; ?>
+                        
+                        <!-- Datos del propietario -->
+                        <?php if ($dir->getNombrePropietario() || $dir->getTelefonoPropietario() || $dir->getEmailPropietario()): ?>
+                            <hr class="my-2">
+                            <div class="small"><strong>Propietario:</strong></div>
+                            <?php if ($dir->getNombrePropietario()): ?>
+                                <div class="small mb-1">
+                                    <i class="bi bi-person me-2 text-secondary"></i><?php echo htmlspecialchars($dir->getNombrePropietario(), ENT_QUOTES, 'UTF-8'); ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($dir->getTelefonoPropietario()): ?>
+                                <div class="small mb-1">
+                                    <i class="bi bi-telephone me-2 text-secondary"></i><a href="tel:<?php echo htmlspecialchars($dir->getTelefonoPropietario(), ENT_QUOTES, 'UTF-8'); ?>" class="text-decoration-none"><?php echo htmlspecialchars($dir->getTelefonoPropietario(), ENT_QUOTES, 'UTF-8'); ?></a>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($dir->getEmailPropietario()): ?>
+                                <div class="small mb-2">
+                                    <i class="bi bi-envelope me-2 text-secondary"></i><a href="mailto:<?php echo htmlspecialchars($dir->getEmailPropietario(), ENT_QUOTES, 'UTF-8'); ?>" class="text-decoration-none"><?php echo htmlspecialchars($dir->getEmailPropietario(), ENT_QUOTES, 'UTF-8'); ?></a>
+                                </div>
+                            <?php endif; ?>
                         <?php endif; ?>
                         
                         <!-- Icono de ubicación y dirección real -->
@@ -96,6 +127,10 @@ foreach ($todasLasDirecciones as $dir):
                             <button type="button" class="btn btn-sm btn-outline-warning edit-dir-btn" data-bs-toggle="modal" data-bs-target="#editDirModal"
                                 data-id="<?php echo htmlspecialchars($dir->getId(), ENT_QUOTES, 'UTF-8'); ?>"
                                 data-nombre="<?php echo htmlspecialchars($dir->getNombre(), ENT_QUOTES, 'UTF-8'); ?>"
+                                data-nombrePropietario="<?php echo htmlspecialchars($dir->getNombrePropietario(), ENT_QUOTES, 'UTF-8'); ?>"
+                                data-telefonoPropietario="<?php echo htmlspecialchars($dir->getTelefonoPropietario(), ENT_QUOTES, 'UTF-8'); ?>"
+                                data-emailPropietario="<?php echo htmlspecialchars($dir->getEmailPropietario(), ENT_QUOTES, 'UTF-8'); ?>"
+                                data-email="<?php echo htmlspecialchars($dir->getEmail(), ENT_QUOTES, 'UTF-8'); ?>"
                                 data-calle="<?php echo htmlspecialchars($dir->getCalle(), ENT_QUOTES, 'UTF-8'); ?>"
                                 data-numero="<?php echo htmlspecialchars($dir->getNumero(), ENT_QUOTES, 'UTF-8'); ?>"
                                 data-puerta="<?php echo htmlspecialchars($dir->getPuerta(), ENT_QUOTES, 'UTF-8'); ?>"
@@ -127,7 +162,13 @@ endforeach; ?>
             <div class="modal-header bg-primary text-white"><h5 class="modal-title">Registrar Nueva Propiedad/Almacén</h5></div>
             <div class="modal-body row g-3">
                 <div class="col-md-6"><label>Nombre de referencia</label><input type="text" name="nombre" class="form-control" placeholder="Ej: Mi Casa" required></div>
-                    <div class="col-md-12"><!-- Los campos de descripción y ruta ya no se muestran --></div>
+                <div class="col-md-12"><h6 class="fw-bold text-secondary mt-2">Datos del Propietario</h6></div>
+                <div class="col-md-6"><label>Nombre del propietario</label><input type="text" name="nombrePropietario" class="form-control" placeholder="Ej: Juan Pérez"></div>
+                <div class="col-md-6"><label>Teléfono</label><input type="text" name="telefonoPropietario" class="form-control" placeholder="Ej: 123-456-7890"></div>
+                <div class="col-md-6"><label>Email del propietario</label><input type="email" name="emailPropietario" class="form-control" placeholder="propietario@ejemplo.com"></div>
+                <div class="col-md-6"><label>Email del creador</label><input type="email" class="form-control" readonly value="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>"></div>
+                <div class="col-md-12"><h6 class="fw-bold text-secondary mt-2">Ubicación de la Propiedad</h6></div>
+                <div class="col-md-12"><!-- Los campos de descripción y ruta ya no se muestran --></div>
                 <div class="col-md-6"><label>Calle / Plaza / Avenida</label><input type="text" name="calle" class="form-control"></div>
                 <div class="col-md-3"><label>Número</label><input type="text" name="numero" class="form-control"></div>
                 <div class="col-md-3"><label>Puerta</label><input type="text" name="puerta" class="form-control"></div>
@@ -167,6 +208,12 @@ endforeach; ?>
             <div class="modal-header bg-primary text-white"><h5 class="modal-title">Editar Propiedad/Almacén</h5></div>
             <div class="modal-body row g-3">
                 <div class="col-md-6"><label>Nombre de referencia</label><input type="text" id="editNombre" name="nombre" class="form-control" placeholder="Ej: Mi Casa" required></div>
+                <div class="col-md-12"><h6 class="fw-bold text-secondary mt-2">Datos del Propietario</h6></div>
+                <div class="col-md-6"><label>Nombre del propietario</label><input type="text" id="editNombrePropietario" name="nombrePropietario" class="form-control" placeholder="Ej: Juan Pérez"></div>
+                <div class="col-md-6"><label>Teléfono</label><input type="text" id="editTelefonoPropietario" name="telefonoPropietario" class="form-control" placeholder="Ej: 123-456-7890"></div>
+                <div class="col-md-6"><label>Email del propietario</label><input type="email" id="editEmailPropietario" name="emailPropietario" class="form-control" placeholder="propietario@ejemplo.com"></div>
+                <div class="col-md-6"><label>Email del creador</label><input type="email" id="editEmail" class="form-control" readonly></div>
+                <div class="col-md-12"><h6 class="fw-bold text-secondary mt-2">Ubicación de la Propiedad</h6></div>
                 <div class="col-md-12"><!-- Los campos de descripción y ruta ya no se muestran --></div>
                 <div class="col-md-6"><label>Calle / Plaza / Avenida</label><input type="text" id="editCalle" name="calle" class="form-control"></div>
                 <div class="col-md-3"><label>Número</label><input type="text" id="editNumero" name="numero" class="form-control"></div>
@@ -288,6 +335,52 @@ endforeach; ?>
     inicializarBuscadorPostal('codigoPostal', 'sugerenciasCodigoPostal', 'ciudad', 'provincia');
     inicializarBuscadorPostal('editCodigoPostal', 'sugerenciasCodigoPostalEdit', 'editCiudad', 'editProvincia');
 
+    // Buscador de direcciones
+    const searchInput = document.getElementById('searchDirecciones');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.direccion-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const nombre = card.dataset.nombre || '';
+                const propietario = card.dataset.propietario || '';
+                const calle = card.dataset.calle || '';
+                const ciudad = card.dataset.ciudad || '';
+                const provincia = card.dataset.provincia || '';
+                const emailProp = card.dataset.emailProp || '';
+                const telProp = card.dataset.telProp || '';
+                
+                const searchText = (nombre + ' ' + propietario + ' ' + calle + ' ' + ciudad + ' ' + provincia + ' ' + emailProp + ' ' + telProp).toLowerCase();
+                
+                if (searchText.includes(searchTerm)) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Mostrar mensaje si no hay resultados
+            const container = document.getElementById('direccionesContainer');
+            let noResults = container.querySelector('.no-results-message');
+            if (visibleCount === 0 && searchTerm !== '') {
+                if (!noResults) {
+                    noResults = document.createElement('div');
+                    noResults.className = 'col-12 no-results-message';
+                    noResults.innerHTML = '<div class="alert alert-info"><i class="bi bi-search me-2"></i>No se encontraron direcciones que coincidan con "' + htmlEscape(searchTerm) + '"</div>';
+                    container.appendChild(noResults);
+                } else {
+                    noResults.innerHTML = '<div class="alert alert-info"><i class="bi bi-search me-2"></i>No se encontraron direcciones que coincidan con "' + htmlEscape(searchTerm) + '"</div>';
+                    noResults.style.display = '';
+                }
+            } else if (noResults) {
+                noResults.style.display = 'none';
+            }
+        });
+    }
+
     const editDirModal = document.getElementById('editDirModal');
     if (editDirModal) {
         // Cuando se abre el modal de edición, copiamos los datos de la tarjeta a los campos del formulario.
@@ -297,6 +390,10 @@ endforeach; ?>
 
             document.getElementById('editDirId').value = button.dataset.id || '';
             document.getElementById('editNombre').value = button.dataset.nombre || '';
+            document.getElementById('editNombrePropietario').value = button.dataset.nombrepropietario || '';
+            document.getElementById('editTelefonoPropietario').value = button.dataset.telefonopropietario || '';
+            document.getElementById('editEmailPropietario').value = button.dataset.emailpropietario || '';
+            document.getElementById('editEmail').value = button.dataset.email || '';
             document.getElementById('editCalle').value = button.dataset.calle || '';
             document.getElementById('editNumero').value = button.dataset.numero || '';
             document.getElementById('editPuerta').value = button.dataset.puerta || '';

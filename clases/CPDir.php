@@ -21,6 +21,9 @@ class CPDir extends CPUser {
     protected $provincia;
     protected $ubicacion; // Carpeta en el disco relacionada con la dirección.
     protected $userId; // Identificador del usuario que creó o dejó la dirección.
+    protected $nombrePropietario; // Nombre del propietario de la propiedad.
+    protected $telefonoPropietario; // Teléfono del propietario.
+    protected $emailPropietario; // Email del propietario.
 
     /**
      * Constructor: crea una nueva dirección con todos sus datos.
@@ -28,7 +31,7 @@ class CPDir extends CPUser {
      * Para alguien que no programa: esto es como crear una ficha nueva
      * donde guardamos la calle, el número, la ciudad, etc.
      */
-    public function __construct($id = null, $nombre = '', $descripcion = '', $ubicacion = '', $calle='', $numero='', $piso='', $puerta='', $escalera='', $codigoPostal='', $ciudad='', $provincia='', $email='', $password='', $role='propietario', $userId=null) {
+    public function __construct($id = null, $nombre = '', $descripcion = '', $ubicacion = '', $calle='', $numero='', $piso='', $puerta='', $escalera='', $codigoPostal='', $ciudad='', $provincia='', $email='', $password='', $role='propietario', $userId=null, $nombrePropietario='', $telefonoPropietario='', $emailPropietario='') {
         parent::__construct($id, $nombre, $email, $password, $role);
 
         $this->setDescripcion($descripcion);
@@ -42,6 +45,9 @@ class CPDir extends CPUser {
         $this->ciudad = $ciudad;
         $this->provincia = $provincia;
         $this->userId = $userId;
+        $this->nombrePropietario = $nombrePropietario;
+        $this->telefonoPropietario = $telefonoPropietario;
+        $this->emailPropietario = $emailPropietario;
     }
 
     /**
@@ -73,7 +79,10 @@ class CPDir extends CPUser {
             $row['email'] ?? '',
             '',
             $row['role'] ?? 'propietario',
-            $row['userId'] ?? null
+            $row['userId'] ?? null,
+            $row['nombrePropietario'] ?? '',
+            $row['telefonoPropietario'] ?? '',
+            $row['emailPropietario'] ?? ''
         );
 
         if (isset($row['fechaCreacion'])) {
@@ -96,7 +105,7 @@ class CPDir extends CPUser {
         if ($this->id) {
             // Actualiza una dirección existente.
             $stmt = $pdo->prepare(
-                'UPDATE direcciones SET nombre = ?, descripcion = ?, ubicacion = ?, calle = ?, numero = ?, piso = ?, puerta = ?, escalera = ?, codigoPostal = ?, ciudad = ?, provincia = ?, email = ?, role = ?, userId = ?, fechaModificacion = NOW() WHERE id = ?'
+                'UPDATE direcciones SET nombre = ?, descripcion = ?, ubicacion = ?, calle = ?, numero = ?, piso = ?, puerta = ?, escalera = ?, codigoPostal = ?, ciudad = ?, provincia = ?, email = ?, role = ?, userId = ?, nombrePropietario = ?, telefonoPropietario = ?, emailPropietario = ?, fechaModificacion = NOW() WHERE id = ?'
             );
             return $stmt->execute([
                 $this->nombre,
@@ -113,13 +122,16 @@ class CPDir extends CPUser {
                 $this->email,
                 $this->role,
                 $this->userId,
+                $this->nombrePropietario,
+                $this->telefonoPropietario,
+                $this->emailPropietario,
                 $this->id
             ]);
         }
 
         // Crea una dirección nueva en la base de datos.
         $stmt = $pdo->prepare(
-            'INSERT INTO direcciones (nombre, descripcion, ubicacion, calle, numero, piso, puerta, escalera, codigoPostal, ciudad, provincia, email, role, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO direcciones (nombre, descripcion, ubicacion, calle, numero, piso, puerta, escalera, codigoPostal, ciudad, provincia, email, role, userId, nombrePropietario, telefonoPropietario, emailPropietario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
 
         $result = $stmt->execute([
@@ -136,7 +148,10 @@ class CPDir extends CPUser {
             $this->provincia,
             $this->email,
             $this->role,
-            $this->userId
+            $this->userId,
+            $this->nombrePropietario,
+            $this->telefonoPropietario,
+            $this->emailPropietario
         ]);
 
         if ($result) {
@@ -222,6 +237,12 @@ class CPDir extends CPUser {
     public function getCiudad() { return $this->ciudad; }
     public function getProvincia() { return $this->provincia; }
     public function getUserId() { return $this->userId; }
+    public function getNombrePropietario() { return $this->nombrePropietario; }
+    public function setNombrePropietario($nombre) { $this->nombrePropietario = $nombre; }
+    public function getTelefonoPropietario() { return $this->telefonoPropietario; }
+    public function setTelefonoPropietario($telefono) { $this->telefonoPropietario = $telefono; }
+    public function getEmailPropietario() { return $this->emailPropietario; }
+    public function setEmailPropietario($email) { $this->emailPropietario = $email; }
 
     /**
      * Devuelve el nombre del archivo de texto usado para exportar o guardar.

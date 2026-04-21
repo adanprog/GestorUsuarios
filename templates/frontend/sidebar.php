@@ -10,12 +10,16 @@ require_once("../backend/sidebar_backend.php");
 <aside class="d-flex flex-column flex-shrink-0 p-3 bg-white border-end shadow-sm" style="width: 100%; max-width: 280px;">
     <!-- CABECERA DEL MENÚ: Info del usuario -->
     <div class="d-flex align-items-center mb-3">
-        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 42px; height: 42px; font-weight: bold;">
-            <?php echo h(strtoupper(substr($correoUsuario, 0, 1))); ?> <!-- Inicial del nombre -->
-        </div>
+        <?php if (!empty($avatarUrl)): ?>
+            <img src="<?php echo h($avatarUrl); ?>" alt="Avatar" class="rounded-circle me-2 shadow-sm" style="width: 42px; height: 42px; object-fit: cover;">
+        <?php else: ?>
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 42px; height: 42px; font-weight: bold;">
+                <?php echo h(strtoupper(substr($correoUsuario, 0, 1))); ?>
+            </div>
+        <?php endif; ?>
         <div class="small overflow-hidden">
             <div class="fw-bold text-dark text-truncate" style="max-width: 180px;">
-                <?php echo h(explode('@', $correoUsuario)[0]); ?> <!-- Solo la parte antes del @ -->
+                <?php echo h(explode('@', $correoUsuario)[0]); ?>
             </div>
             <div class="text-muted smaller"><?php echo h($correoUsuario); ?></div>
             <div class="mt-1">

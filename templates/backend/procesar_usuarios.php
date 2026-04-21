@@ -26,11 +26,19 @@ $isAdminUser = $currentUser ? $currentUser->esAdministrador() : false;
 
 // 1. Añadir usuario.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
-    $message = CPUser::agregar(
-        cp_post_string('email'),
-        cp_post_string('password'),
-        cp_post_string('role')
-    );
+    $email = cp_post_string('email');
+    $password = cp_post_string('password');
+    $passwordConfirm = cp_post_string('password_confirm');
+    $role = cp_post_string('role');
+    
+    // Validar que las contraseñas coincidan
+    if ($password !== $passwordConfirm) {
+        $message = 'Las contraseñas no coinciden. Por favor, verifica que ambas sean idénticas.';
+    } else if (strlen($password) < 6) {
+        $message = 'La contraseña debe tener al menos 6 caracteres.';
+    } else {
+        $message = CPUser::agregar($email, $password, $role);
+    }
     $messageType = cp_alert_type_from_message($message);
 }
 
@@ -55,24 +63,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_user'])) {
     if (!$u) {
         $message = 'Usuario no encontrado para editar.';
     } else {
-        if (!$isAdminUser) {
-            $nuevoRol = $u->getRole();
+        // Validar que las contraseñas coincidan si se proporciona una nueva
+        $password = cp_post_string('password');
+        $passwordConfirm = cp_post_string('password_confirm');
+        
+        if ($password || $passwordConfirm) {
+            if ($password !== $passwordConfirm) {
+                $message = 'Las contraseñas no coinciden. Por favor, verifica que ambas sean idénticas.';
+            } else if (strlen($password) < 6) {
+                $message = 'La contraseña debe tener al menos 6 caracteres.';
+            }
         }
+        
+        if (!$message) {
+            if (!$isAdminUser) {
+                $nuevoRol = $u->getRole();
+            }
 
-        $message = CPUser::actualizar(
-            cp_post_string('original_email'),
-            cp_post_string('username'),
-            cp_post_string('lastname'),
-            cp_post_string('DNI'),
-            cp_post_string('telefono'),
-            cp_post_string('email'),
-            cp_post_string('password'),
-            $nuevoRol,
-            cp_post_string('fechaNacimiento')
-        );
+            // Si no se proporciona contraseña, mantener la actual
+            $passwordAUsar = $password ?: $u->getPassword();
+
+            $message = CPUser::actualizar(
+                cp_post_string('original_email'),
+                cp_post_string('username'),
+                cp_post_string('lastname'),
+                cp_post_string('DNI'),
+                cp_post_string('telefono'),
+                cp_post_string('email'),
+                $passwordAUsar,
+                $nuevoRol,
+                cp_post_string('fechaNacimiento')
+            );
+        }
     }
 
-    if (isset($_POST['active'])) {
+    if (!$message && isset($_POST['active'])) {
         $estadoActivo = cp_post_string('active') === '1' ? 1 : 0;
         $u = CPUser::buscarPorEmail(cp_post_string('email'));
         if ($u) {

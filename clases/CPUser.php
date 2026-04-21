@@ -20,11 +20,12 @@ class CPUser extends CPGenerico {
     protected $password;
     protected $role;
     protected $activo = 1;
+    protected $avatar = '';
 
     /**
      * Constructor: crea un objeto usuario con todos sus datos.
      */
-    public function __construct($id = null, $username = '', $email = '', $password = '', $role = null, $apellidos = '', $DNI = '', $fechaNacimiento = '', $telefono = '', $activo = 1) {
+    public function __construct($id = null, $username = '', $email = '', $password = '', $role = null, $apellidos = '', $DNI = '', $fechaNacimiento = '', $telefono = '', $activo = 1, $avatar = '') {
         parent::__construct($id, $username, '');
         $this->id = $id;
         $this->username = $username;
@@ -36,6 +37,7 @@ class CPUser extends CPGenerico {
         $this->setPassword($password);
         $this->role = $role;
         $this->activo = $activo;
+        $this->avatar = $avatar;
     }
 
     // Métodos para obtener y cambiar los datos del usuario.
@@ -53,6 +55,18 @@ class CPUser extends CPGenerico {
     public function getEmail() { return $this->email; }
     public function setEmail($e) { $this->email = $e; $this->actualizarFechaModificacion(); }
     public function getPassword() { return $this->password; }
+    public function getAvatar() { return $this->avatar; }
+    public function setAvatar($avatar) { $this->avatar = $avatar; $this->actualizarFechaModificacion(); }
+    public function getAvatarUrl(string $baseUrl = ''): string {
+        if (empty($this->avatar)) {
+            return '';
+        }
+        $avatarPath = ltrim($this->avatar, '/');
+        if (empty($baseUrl)) {
+            return '/' . $avatarPath;
+        }
+        return rtrim($baseUrl, '/') . '/' . $avatarPath;
+    }
 
     /**
      * Guarda la contraseña en formato seguro. Si ya está cifrada, la deja igual.
@@ -229,6 +243,7 @@ class CPUser extends CPGenerico {
     }
 
     private static $hasActivoColumn = null;
+    private static $hasAvatarColumn = null;
 
     private static function getPdo() {
         return Database::getConnection();
@@ -252,37 +267,49 @@ class CPUser extends CPGenerico {
         }
     }
 
-    public static function fromRow(array $row): self {
-        $usuario = new self(
-            $row['id'] ?? null,
-            $row['username'] ?? '',
-            $row['email'] ?? '',
-            $row['password'] ?? '',
-            $row['role'] ?? null,
-            $row['apellidos'] ?? '',
-            $row['DNI'] ?? '',
-            $row['fechaNacimiento'] ?? '',
-            $row['telefono'] ?? '',
-            $row['activo'] ?? 1
-        );
-
-        if (isset($row['fechaCreacion'])) {
-            $usuario->setFechaCreacion($row['fechaCreacion']);
-        }
-        if (isset($row['fechaModificacion'])) {
-            $usuario->setFechaModificacion($row['fechaModificacion']);
+    private static function ensureAvatarColumn(): void {
+        if (self::$hasAvatarColumn !== null) {
+            return;
         }
 
-        return $usuario;
+        $pdo = self::getPdo();
+        try {
+            $stmt = $pdo->query("SHOW COLUMNS FROM users LIKE 'avatar'");
+            $columnExists = (bool)$stmt->fetch();
+            if (!$columnExists) {
+                $pdo->exec("ALTER TABLE users ADD COLUMN avatar VARCHAR(255) NULL AFTER telefono");
+            }
+            self::$hasAvatarColumn = true;
+        } catch (PDOException $e) {
+            self::$hasAvatarColumn = false;
+        }
     }
 
     public function guardar(): bool {
         $pdo = self::getPdo();
-
         self::ensureActivoColumn();
+        self::ensureAvatarColumn();
         $useActivoField = self::$hasActivoColumn === true;
+        $useAvatarField = self::$hasAvatarColumn === true;
 
         if ($this->id) {
+            if ($useActivoField && $useAvatarField) {
+                $stmt = $pdo->prepare('UPDATE users SET username = ?, apellidos = ?, DNI = ?, fechaNacimiento = ?, telefono = ?, email = ?, password = ?, role = ?, activo = ?, avatar = ?, fechaModificacion = NOW() WHERE id = ?');
+                return $stmt->execute([
+                    $this->username,
+                    $this->apellidos,
+                    $this->DNI,
+                    $this->fechaNacimiento,
+                    $this->telefono,
+                    $this->email,
+                    $this->password,
+                    $this->role,
+                    $this->activo,
+                    $this->avatar,
+                    $this->id
+                ]);
+            }
+
             if ($useActivoField) {
                 $stmt = $pdo->prepare('UPDATE users SET username = ?, apellidos = ?, DNI = ?, fechaNacimiento = ?, telefono = ?, email = ?, password = ?, role = ?, activo = ?, fechaModificacion = NOW() WHERE id = ?');
                 return $stmt->execute([
@@ -295,6 +322,22 @@ class CPUser extends CPGenerico {
                     $this->password,
                     $this->role,
                     $this->activo,
+                    $this->id
+                ]);
+            }
+
+            if ($useAvatarField) {
+                $stmt = $pdo->prepare('UPDATE users SET username = ?, apellidos = ?, DNI = ?, fechaNacimiento = ?, telefono = ?, email = ?, password = ?, role = ?, avatar = ?, fechaModificacion = NOW() WHERE id = ?');
+                return $stmt->execute([
+                    $this->username,
+                    $this->apellidos,
+                    $this->DNI,
+                    $this->fechaNacimiento,
+                    $this->telefono,
+                    $this->email,
+                    $this->password,
+                    $this->role,
+                    $this->avatar,
                     $this->id
                 ]);
             }
@@ -313,7 +356,21 @@ class CPUser extends CPGenerico {
             ]);
         }
 
-        if ($useActivoField) {
+        if ($useActivoField && $useAvatarField) {
+            $stmt = $pdo->prepare('INSERT INTO users (username, apellidos, DNI, fechaNacimiento, telefono, email, password, role, activo, avatar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            $result = $stmt->execute([
+                $this->username,
+                $this->apellidos,
+                $this->DNI,
+                $this->fechaNacimiento,
+                $this->telefono,
+                $this->email,
+                $this->password,
+                $this->role,
+                $this->activo,
+                $this->avatar
+            ]);
+        } elseif ($useActivoField) {
             $stmt = $pdo->prepare('INSERT INTO users (username, apellidos, DNI, fechaNacimiento, telefono, email, password, role, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
             $result = $stmt->execute([
                 $this->username,
@@ -325,6 +382,19 @@ class CPUser extends CPGenerico {
                 $this->password,
                 $this->role,
                 $this->activo
+            ]);
+        } elseif ($useAvatarField) {
+            $stmt = $pdo->prepare('INSERT INTO users (username, apellidos, DNI, fechaNacimiento, telefono, email, password, role, avatar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            $result = $stmt->execute([
+                $this->username,
+                $this->apellidos,
+                $this->DNI,
+                $this->fechaNacimiento,
+                $this->telefono,
+                $this->email,
+                $this->password,
+                $this->role,
+                $this->avatar
             ]);
         } else {
             $stmt = $pdo->prepare('INSERT INTO users (username, apellidos, DNI, fechaNacimiento, telefono, email, password, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
@@ -353,6 +423,33 @@ class CPUser extends CPGenerico {
         $rows = $stmt->fetchAll();
 
         return array_map(fn($row) => self::fromRow($row), $rows);
+    }
+
+    private static function fromRow($row): ?self {
+        if (!$row) return null;
+
+        $usuario = new self(
+            $row['id'] ?? null,
+            $row['username'] ?? '',
+            $row['email'] ?? '',
+            $row['password'] ?? '',
+            $row['role'] ?? null,
+            $row['apellidos'] ?? '',
+            $row['DNI'] ?? '',
+            $row['fechaNacimiento'] ?? '',
+            $row['telefono'] ?? '',
+            $row['activo'] ?? 1,
+            $row['avatar'] ?? ''
+        );
+
+        if (isset($row['fechaCreacion'])) {
+            $usuario->setFechaCreacion($row['fechaCreacion']);
+        }
+        if (isset($row['fechaModificacion'])) {
+            $usuario->setFechaModificacion($row['fechaModificacion']);
+        }
+
+        return $usuario;
     }
 
     public static function borrarPorId($id): bool {
