@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gestor Personal - Panel de Control</title>
+    <title>Gestor de Direcciones - Panel de Control</title>
     <!-- Incluimos Bootstrap para el diseño visual -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -226,13 +226,27 @@ if (!isset($_SESSION['logged_in']) && basename($_SERVER['SCRIPT_NAME']) !== 'ind
 }
 ?>
 <body class="d-flex flex-column min-vh-100">
+<?php if (basename($_SERVER['SCRIPT_NAME']) === 'index.php'): ?>
+<style>
+body {
+    background-image: url('<?php echo h($raizProyecto); ?>/imagen/fondoDir.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+body.dark-mode {
+    background-image: url('<?php echo h($raizProyecto); ?>/imagen/fondoNocheDir.png');
+}
+</style>
+<?php endif; ?>
     <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
     <nav class="navbar fixed-top bg-white border-bottom shadow-sm mb-0 py-2">
         <div class="container-fluid px-4 position-relative d-flex align-items-center">
             <!-- Logo principal que nos lleva al inicio -->
             <a class="navbar-brand fw-bold d-flex align-items-center" href="<?php echo h($raizProyecto); ?>/index.php">
-                <i class="bi bi-person-badge-fill me-2 text-primary fs-4"></i>
-                <span class="d-none d-sm-inline">Gestor Personal</span>
+                <img src="<?php echo h($raizProyecto); ?>/imagen/logoAppDir.png" alt="Logo" class="me-2" style="height: 32px;">
+                <span class="d-none d-sm-inline">Gestor de Direcciones</span>
             </a>
             
             <div class="position-absolute top-50 start-50 translate-middle">

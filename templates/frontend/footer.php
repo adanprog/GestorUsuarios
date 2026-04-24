@@ -3,7 +3,9 @@
     <!-- PIE DE PÁGINA (FOOTER) -->
     <footer class="container-fluid py-3 bg-light border-top mt-auto">
         <div class="d-flex align-items-center justify-content-between px-4">
-            <span class="text-body-secondary small">© 2026 Sistema Gestor Personal Premium</span>
+            <div class="d-flex align-items-center">
+                <span class="text-body-secondary small">© 2026 Sistema Gestor de Direcciones Premium</span>
+            </div>
             <a href="#" class="nav-link px-2 text-body-secondary small mb-0">Centro de Soporte</a>
         </div>
     </footer>

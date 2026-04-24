@@ -8,6 +8,7 @@ require_once("../backend/sidebar_backend.php");
 ?>
 
 <aside class="d-flex flex-column flex-shrink-0 p-3 bg-white border-end shadow-sm" style="width: 100%; max-width: 280px;">
+
     <!-- CABECERA DEL MENÚ: Info del usuario -->
     <div class="d-flex align-items-center mb-3">
         <?php if (!empty($avatarUrl)): ?>

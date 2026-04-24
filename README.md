@@ -1,4 +1,4 @@
-# Gestor Personal - Sistema de Gestión de Propiedades y Usuarios
+# Gestor de Direcciones - Sistema de Gestión de Direcciones y Usuarios
 
 ![Version](https://img.shields.io/badge/version-1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -7,7 +7,7 @@
 
 ## 📋 Descripción
 
-**Gestor Personal** es una aplicación web completa para la gestión de propiedades, usuarios y roles. Permite administradores gestionar el sistema de forma centralizada, mientras que usuarios normales pueden manejar sus propias direcciones de forma segura.
+**Gestor de Direcciones** es una aplicación web completa para la gestión de direcciones, usuarios y roles. Permite administradores gestionar el sistema de forma centralizada, mientras que usuarios normales pueden manejar sus propias direcciones de forma segura.
 
 ## ✨ Características Principales
 
@@ -68,7 +68,7 @@
 #### 1. Clonar o descargar el proyecto
 ```bash
 cd c:\xampp\htdocs\
-# Descarga o clona el proyecto en la carpeta gestion_personal
+# Descarga o clona el proyecto en la carpeta gestor_direcciones
 ```
 
 #### 2. Configurar la base de datos
@@ -76,7 +76,7 @@ Edita `config.php` con tus datos:
 ```php
 $host = "localhost";
 $port = 3307; // o el puerto de tu MySQL
-$db_name = "gestor_personaltfg";
+$db_name = "gestor_direcciones";
 $user = "root";
 $password = ""; // contraseña de tu MySQL
 ```
@@ -86,8 +86,8 @@ Abre en tu navegador:
 ```
 http://localhost/phpmyadmin/
 ```
-- Crea una base de datos llamada `gestor_personaltfg`
-- Importa el archivo `bbdd/gestor_personaltfg.sql`
+- Crea una base de datos llamada `gestor_direcciones`
+- Importa el archivo `bbdd/gestor_direcciones.sql`
 
 O ejecuta desde terminal:
 ```bash
@@ -103,7 +103,7 @@ VALUES ('Administrador', 'admin@email.com', SHA2('contraseña123', 256), 'admini
 
 #### 5. Acceder a la aplicación
 ```
-http://localhost:3307/gestion_personal/
+http://localhost:3307/gestor_direcciones/
 ```
 **Email**: admin@email.com  
 **Contraseña**: contraseña123
@@ -111,7 +111,7 @@ http://localhost:3307/gestion_personal/
 ## 📁 Estructura del Proyecto
 
 ```
-gestion_personal/
+gestor_direcciones/
 ├── index.php                          # Página de login
 ├── logout.php                         # Cierre de sesión
 ├── config.php                         # Configuración de base de datos
@@ -135,7 +135,7 @@ gestion_personal/
 │   │   ├── login.php                  # Formulario de login
 │   │   ├── usuarios.php               # Gestión de usuarios
 │   │   ├── roles.php                  # Gestión de roles
-│   │   ├── direcciones.php            # Gestión de propiedades
+│   │   ├── direcciones.php            # Gestión de direcciones
 │   │   ├── edituser.php               # Editar perfil
 │   │   └── profile.php                # Ver perfil
 │   │
@@ -152,7 +152,7 @@ gestion_personal/
 │   └── codigos_postales_cache.json    # Códigos postales
 │
 ├── bbdd/                              # Base de datos
-│   └── gestor_personaltfg.sql         # Script SQL
+│   └── gestor_direcciones.sql         # Script SQL
 │
 └── scripts/
     └── create_database_tables.php     # Crear tablas
