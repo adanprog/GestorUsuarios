@@ -19,7 +19,7 @@ class Database {
         $config = require dirname(__DIR__) . '/config.php';
 
         $host = $config['db_host'];
-        $port = $config['db_port'] ?? '3306';
+        $port = $config['db_port'] ?? '3306'; // Puerto por defecto de MySQL.
         $db   = $config['db_name'];
         $user = $config['db_user'];
         $pass = $config['db_pass'];

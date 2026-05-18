@@ -128,9 +128,9 @@ class CPUser extends CPGenerico {
                 'view_all_direcciones' => false,
                 'view_own_direcciones' => true,
                 'add_direcciones' => true,
-                'delete_direcciones' => false,
+                'delete_direcciones' => true,
                 'view_creator' => false,
-                'edit_direcciones' => false,
+                'edit_direcciones' => true,
             ],
             'gerente' => [
                 'view_all_direcciones' => true,
